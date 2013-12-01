@@ -8,5 +8,5 @@
 
 [Dinky Projects][2] is designed for the noob get a little practice on projects. Practice makes perfect, and sometimes we're just looking for dinky little projects to spend a little time on. Got stuck on a Dinky Project? This is the place to find solutions and test frameworks on what I've done. There may be many ways to complete a project, so these solutions are not definitive (and may not even be the best solutions), but they get the job done.
 
-[1]: www.noobjs.org
-[2]: www.noobjs.org/#/projects
+[1]: http://noobjs.org
+[2]: http://noobjs.org/#/projects
