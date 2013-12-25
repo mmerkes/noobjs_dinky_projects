@@ -1,0 +1,255 @@
+<html>
+	<head>
+		<title>Table Creating</title>
+		<script>
+			(function() {
+				var queue = [], paused = false, results;
+
+				this.test = function(name, fn) {
+					queue.push(function() {
+						results = document.getElementById("results");
+						results = assert(true, name).appendChild(
+							document.createElement('ul'));
+						fn();
+					});
+					runTest();
+				};
+
+				this.pause = function() {
+					paused = true;
+				};
+
+				this.resume = function() {
+					paused = false;
+					setTimeout(runTest, 1);
+				};
+
+				function runTest() {
+					if (!paused && queue.length) {
+						queue.shift()();
+						if (!paused) {
+							resume();
+						}
+					}
+				}
+
+				this.assert = function assert(value, desc) {
+					var li = document.createElement('li');
+					li.className = value ? 'pass' : 'fail';
+					li.appendChild(document.createTextNode(desc));
+					results.appendChild(li);
+					if(!value) {
+						li.parentNode.parentNode.className = 'fail';
+					}
+					return li;
+				};
+			})();
+		</script>
+		<style>
+			#results { float: left;}
+			#results li.pass { color: white; }
+			#results li.fail { color: red; }
+			body { background-color: #669999;}
+			td { 
+				background-color: white;
+				width: 75px;
+				height: 75px;
+			}
+			.highlight { background-color: #666633;}
+			#controlPanel { padding: 20px;}
+			#prettyTable { 
+				float: left;
+				padding: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="prettyTable">
+		</div>
+		<div id="controlPanel">
+			<h3>Change Table</h3>
+			<p>
+				Size: 
+				<input type='text' id="columns"></input>
+				<input type='text' id="rows"></input>
+				<button id='resize'>Resize</button>
+			</p>
+			<div id='buttons'>
+				<button id="alternateRows">Alternate Rows</button>
+				<button id="alternateColumns">Alternate Columns</button>
+				<button id="diagonal">Diagonal</button>
+				<button id="diamond">Diamond</button>
+				<hr>
+				<button id="test">Test</button>
+			</div>
+			<ul id="results"></ul>
+		</div>
+		<!-- <script src="tests.js"></script> -->
+		<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+		<script src="tests.js"></script>
+		<script>
+			// Create a function called 'createTable' that takes
+			// two arguments: rows and columns, and creates a table 
+			// of that size and attaches it to the '#prettyTable' div
+			function createTable(rows, columns) {
+				var i, j, row, el, table;
+				table = $('#prettyTable').append('<table></table>')
+							.find('table')
+							.last();
+
+				for(i = 0; i < rows; i++) {
+					row = table.append('<tr></tr>')
+							.find('tr')
+							.last();
+					for(j = 0; j < columns; j++) {
+						row.append('<td></td>');
+					}
+				}
+			};
+
+			// Create a function that removes the table from the
+			// '#prettyTable' div
+			function removeTable(){
+				return $('#prettyTable').empty();
+			};
+
+			// Create a function that takes the '#columns' and
+			// '#rows' input values, and replaces the existing table
+			// with a new table of that size
+			function resizeTable() {
+				var columns = +$('#columns').val(),
+					rows = +$('#rows').val();
+
+				if( columns && rows ) {
+					removeTable();
+					return createTable( rows, columns, '#prettyTable' );
+				}
+				return console.log('Values must be numbers.');
+			}
+
+			// wipes the cells of the table of classes
+			function wipeClasses() {
+				return $('#prettyTable').find('td').removeClass();
+			};
+
+			// returns the table rows
+			function getRows() {
+				return $('#prettyTable').find('tr');
+			};
+
+			// Create a function that highlights alternating
+			// table rows, starting with the second row being
+			// highlighted, by adding the class 'highlight' to the 
+			// appropriate cells
+			function alternateRows(){
+				var rows = getRows();
+				wipeClasses();
+				for(var i = 1; i < rows.length; i++) {
+					if(i % 2 !== 0)
+						$(rows[i]).find('td').addClass('highlight');
+				}
+			};
+
+			// Create a function that highlights alternating columns,
+			// starting with the second column, but adding the class
+			// 'highlight' to the appropriate cells
+			function alternateColumns(){
+				var rows = getRows();
+				var row, i, j;
+				wipeClasses();
+				for(var i = 0; i < rows.length; i++){
+					row = $(rows[i]).find('td');
+					for(var j = 1; j < row.length; j++){
+						if(j % 2 !== 0)
+							$(row[j]).addClass('highlight');
+					}
+				}
+			};
+
+			// Create a function called diagonal that creates a
+			// diagonal pattern by adding the 'highlight' class
+			// to the appropriate cells. Start with the upper left
+			// corner and go down 45 degrees as long as the rows
+			// and columns allow
+			function diagonal() {
+				var rows = getRows();
+				wipeClasses();
+				var i, j = 0, row, cells;
+
+				for(i = 0; i < rows.length; i++) {
+					cells = $(rows[i]).find('td');
+					$(cells[j]).addClass('highlight');
+					j++;
+				}
+			};
+
+			// Create a function that creates the largest possible
+			// diamond, a square rotated 45 degrees. i.e.
+			// 0100
+			// 1110
+			// 0100
+			// 0000
+
+			// 00100
+			// 01110
+			// 11111
+			// 01110
+			// 00100
+			function diamond() {
+				var rows = getRows();
+				var columns = wipeClasses().length / rows.length;
+				var left = right = Math.ceil( columns / 2 ) - 1;
+				var row, i, j, expanding = true;
+
+				for(i = 0; i < rows.length; i++) {
+					row = $(rows[i]).find('td');
+					for(j = 0; j <= right; j++) {
+						if(j >= left) {
+							$(row[j]).addClass('highlight');
+						}
+					}
+					
+					if(left === 0) {
+						expanding = false;
+					}
+
+					if(expanding) {
+						left--;
+						right++;
+					} else {
+						left++;
+						right--;
+					}
+				}
+			};
+
+			// Add other helper functions as needed. Possibly, to 
+			// get rows, clear classes, etc.
+
+			$(document).ready( function() {
+				createTable(8, 8);
+
+				// Add click listeners for the buttons '#resize',
+				// '#alternateRows', '#alternateColumns',
+				// '#diagonal', and '#diamond' to update the table
+				// and run your functions
+
+				$('#resize').click( resizeTable );
+
+				$('#alternateRows').click( alternateRows );
+
+				$('#alternateColumns').click( alternateColumns );
+
+				$('#diagonal').click( diagonal );
+
+				$('#diamond').click( diamond );
+
+				$('#test').click( tester );
+			});
+		</script>
+	</body>
+</html>
+
+
+
+
