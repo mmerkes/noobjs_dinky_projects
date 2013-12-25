@@ -94,8 +94,7 @@
 			function createTable(rows, columns) {
 				var i, j, row, el, table;
 				table = $('#prettyTable').append('<table></table>')
-							.find('table')
-							.last();
+							.find('table');
 
 				for(i = 0; i < rows; i++) {
 					row = table.append('<tr></tr>')
